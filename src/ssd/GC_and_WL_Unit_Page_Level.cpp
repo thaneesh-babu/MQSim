@@ -9,18 +9,18 @@ namespace SSD_Components
 {
 
 	GC_and_WL_Unit_Page_Level::GC_and_WL_Unit_Page_Level(const sim_object_id_type& id,
-		Address_Mapping_Unit_Base* address_mapping_unit, Flash_Block_Manager_Base* block_manager, TSU_Base* tsu, NVM_PHY_ONFI* flash_controller, 
+		Address_Mapping_Unit_Base* address_mapping_unit, Flash_Block_Manager_Base* block_manager, TSU_Base* tsu, NVM_PHY_ONFI* flash_controller,
 		GC_Block_Selection_Policy_Type block_selection_policy, double gc_threshold, bool preemptible_gc_enabled, double gc_hard_threshold,
 		unsigned int ChannelCount, unsigned int chip_no_per_channel, unsigned int die_no_per_chip, unsigned int plane_no_per_die,
-		unsigned int block_no_per_plane, unsigned int Page_no_per_block, unsigned int sectors_per_page, 
+		unsigned int block_no_per_plane, unsigned int Page_no_per_block, unsigned int sectors_per_page,
 		bool use_copyback, double rho, unsigned int max_ongoing_gc_reqs_per_plane, bool dynamic_wearleveling_enabled, bool static_wearleveling_enabled, unsigned int static_wearleveling_threshold, int seed)
 		: GC_and_WL_Unit_Base(id, address_mapping_unit, block_manager, tsu, flash_controller, block_selection_policy, gc_threshold, preemptible_gc_enabled, gc_hard_threshold,
-		ChannelCount, chip_no_per_channel, die_no_per_chip, plane_no_per_die, block_no_per_plane, Page_no_per_block, sectors_per_page, use_copyback, rho, max_ongoing_gc_reqs_per_plane, 
+		ChannelCount, chip_no_per_channel, die_no_per_chip, plane_no_per_die, block_no_per_plane, Page_no_per_block, sectors_per_page, use_copyback, rho, max_ongoing_gc_reqs_per_plane,
 			dynamic_wearleveling_enabled, static_wearleveling_enabled, static_wearleveling_threshold, seed)
 	{
 		rga_set_size = (unsigned int)log2(block_no_per_plane);
 	}
-	
+
 	bool GC_and_WL_Unit_Page_Level::GC_is_in_urgent_mode(const NVM::FlashMemory::Flash_Chip* chip)
 	{
 		if (!preemptible_gc_enabled) {
@@ -114,7 +114,7 @@ namespace SSD_Components
 					unsigned int repeat = 0;
 
 					//The selected gc block should have a minimum number of invalid pages
-					while ((pbke->Blocks[gc_candidate_block_id].Current_page_write_index < pages_no_per_block 
+					while ((pbke->Blocks[gc_candidate_block_id].Current_page_write_index < pages_no_per_block
 						|| pbke->Blocks[gc_candidate_block_id].Invalid_page_count < random_pp_threshold
 						|| !is_safe_gc_wl_candidate(pbke, gc_candidate_block_id))
 						&& repeat++ < block_no_per_plane) {
@@ -134,7 +134,7 @@ namespace SSD_Components
 			if (pbke->Ongoing_erase_operations.find(gc_candidate_block_id) != pbke->Ongoing_erase_operations.end()) {
 				return;
 			}
-			
+
 			NVM::FlashMemory::Physical_Page_Address gc_candidate_address(plane_address);
 			gc_candidate_address.BlockID = gc_candidate_block_id;
 			Block_Pool_Slot_Type* block = &pbke->Blocks[gc_candidate_block_id];
@@ -143,12 +143,12 @@ namespace SSD_Components
 			if (block->Current_page_write_index == 0 || block->Invalid_page_count == 0) {
 				return;
 			}
-			
+
 			//Run the state machine to protect against race condition
 			block_manager->GC_WL_started(gc_candidate_address);
 			pbke->Ongoing_erase_operations.insert(gc_candidate_block_id);
 			address_mapping_unit->Set_barrier_for_accessing_physical_block(gc_candidate_address);//Lock the block, so no user request can intervene while the GC is progressing
-			
+
 			//If there are ongoing requests targeting the candidate block, the gc execution should be postponed
 			if (block_manager->Can_execute_gc_wl(gc_candidate_address)) {
 				Stats::Total_gc_executions++;
@@ -189,4 +189,20 @@ namespace SSD_Components
 			}
 		}
 	}
+
+	// check if the block is GC active
+	bool GCInfoInterface::isGCActive(flash_block_ID_type blockID) {
+		return GCInfoInterface::GCInfoMap[blockID].isActive;
+	}
+
+	// return GCInfo map
+	std::map<flash_block_ID_type, GCInfo> GCInfoInterface::getGCInfoMap() {
+		return GCInfoInterface::GCInfoMap;
+	}
+
+	// add to GCInfo map
+	void GCInfoInterface::setGCInfoMap(flash_block_ID_type blockID, GCInfo gcInfo) {
+		GCInfoInterface::GCInfoMap[blockID] = gcInfo;
+	}
+
 }
