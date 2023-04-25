@@ -37,7 +37,7 @@ namespace SSD_Components
 		// std::queue<NVM_Transaction_Flash*> AwaitingQueue;
 	};
 
-	class GCInfoInterface : public GC_and_WL_Unit_Page_Level
+	class GCInfoInterface
 	{
 	public:
 		bool isGCActive(flash_block_ID_type BlockID);
