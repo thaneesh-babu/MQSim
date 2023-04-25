@@ -189,20 +189,4 @@ namespace SSD_Components
 			}
 		}
 	}
-
-	// check if the block is GC active
-	bool GCInfoInterface::isGCActive(flash_block_ID_type blockID) {
-		return GCInfoInterface::GCInfoMap[blockID].isActive;
-	}
-
-	// return GCInfo map
-	std::map<flash_block_ID_type, GCInfo> GCInfoInterface::getGCInfoMap() {
-		return GCInfoInterface::GCInfoMap;
-	}
-
-	// add to GCInfo map
-	void GCInfoInterface::setGCInfoMap(flash_block_ID_type blockID, GCInfo gcInfo) {
-		GCInfoInterface::GCInfoMap[blockID] = gcInfo;
-	}
-
 }

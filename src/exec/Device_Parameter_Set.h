@@ -13,6 +13,11 @@
 #include "Parameter_Set_Base.h"
 #include "Flash_Parameter_Set.h"
 
+struct GCInfo {
+		bool isActive;
+		// std::queue<NVM_Transaction_Flash*> AwaitingQueue;
+};
+
 class Device_Parameter_Set : public Parameter_Set_Base
 {
 public:
@@ -57,6 +62,13 @@ public:
 	static Flash_Parameter_Set Flash_Parameters;
 	void XML_serialize(Utils::XmlWriter& xmlwriter);
 	void XML_deserialize(rapidxml::xml_node<> *node);
+	// GC Info Interface
+	bool isGCActive(flash_block_ID_type BlockID);
+	std::map<flash_block_ID_type, GCInfo> getGCInfoMap();
+	void setGCInfoMap(flash_block_ID_type BlockID);
+	void clearGCInfoMap(flash_block_ID_type BlockID);
+private:
+	std::map<flash_block_ID_type, GCInfo> GCInfoMap;
 };
 
 #endif // !DEVICE_PARAMETER_SET_H

@@ -161,7 +161,7 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	attr = "Ideal_Mapping_Table";
 	val = (Use_Copyback_for_GC ? "true" : "false");
 	xmlwriter.Write_attribute_string(attr, val);
-	
+
 	attr = "CMT_Capacity";
 	val = std::to_string(CMT_Capacity);
 	xmlwriter.Write_attribute_string(attr, val);
@@ -306,7 +306,7 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 			break;
 	}
 	xmlwriter.Write_attribute_string(attr, val);
-	
+
 	attr = "Use_Copyback_for_GC";
 	val = (Use_Copyback_for_GC ? "true" : "false");
 	xmlwriter.Write_attribute_string(attr, val);
@@ -326,11 +326,11 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	attr = "Static_Wearleveling_Enabled";
 	val = (Static_Wearleveling_Enabled ? "true" : "false");
 	xmlwriter.Write_attribute_string(attr, val);
-	
+
 	attr = "Static_Wearleveling_Threshold";
 	val = std::to_string(Static_Wearleveling_Threshold);
 	xmlwriter.Write_attribute_string(attr, val);
-	
+
 	attr = "Preferred_suspend_erase_time_for_read";
 	val = std::to_string(Preferred_suspend_erase_time_for_read);
 	xmlwriter.Write_attribute_string(attr, val);
@@ -636,4 +636,28 @@ void Device_Parameter_Set::XML_deserialize(rapidxml::xml_node<> *node)
 	{
 		PRINT_ERROR("Error in Device_Parameter_Set!")
 	}
+}
+
+// check if the block is GC active
+bool Device_Parameter_Set::isGCActive(flash_block_ID_type blockID) {
+	return Device_Parameter_Set::GCInfoMap[blockID].isActive;
+}
+
+// return GCInfo map
+std::map<flash_block_ID_type, GCInfo> Device_Parameter_Set::getGCInfoMap() {
+	return Device_Parameter_Set::GCInfoMap;
+}
+
+// set as GC active in GCInfo map
+void Device_Parameter_Set::setGCInfoMap(flash_block_ID_type blockID) {
+	GCInfo gcInfo;
+	gcInfo.isActive = true;
+	Device_Parameter_Set::GCInfoMap[blockID] = gcInfo;
+}
+
+// set as GC inactive in GCInfo map
+void Device_Parameter_Set::clearGCInfoMap(flash_block_ID_type blockID) {
+	GCInfo gcInfo;
+	gcInfo.isActive = false;
+	Device_Parameter_Set::GCInfoMap[blockID] = gcInfo;
 }

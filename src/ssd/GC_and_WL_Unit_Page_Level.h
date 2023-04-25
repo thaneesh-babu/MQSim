@@ -29,24 +29,5 @@ namespace SSD_Components
 	private:
 		NVM_PHY_ONFI * flash_controller;
 	};
-
-	// GC Info Interface
-
-	struct GCInfo {
-		bool isActive;
-		// std::queue<NVM_Transaction_Flash*> AwaitingQueue;
-	};
-
-	class GCInfoInterface
-	{
-	public:
-		bool isGCActive(flash_block_ID_type BlockID);
-		std::map<flash_block_ID_type, GCInfo> getGCInfoMap();
-		void setGCInfoMap(flash_block_ID_type BlockID, GCInfo gcInfo);
-		// std::queue<NVM_Transaction_Flash*> getAwaitingQueue(flash_block_ID_type BlockID);
-		// void setAwaitingQueue(flash_block_ID_type BlockID, std::queue<NVM_Transaction_Flash*> awaitingQueue);
-	private:
-		std::map<flash_block_ID_type, GCInfo> GCInfoMap;
-	};
 }
 #endif // !GC_AND_WL_UNIT_PAGE_LEVEL_H
